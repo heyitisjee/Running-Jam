@@ -1,4 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0E0E0E"><style>*{margin:0}[hidden]{display:none!important}body{margin:0}img{max-width:100%}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style></head><body><title>Running Jam</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0E0E0E"><style>*{margin:0}[hidden]{display:none!important}body{margin:0}img{max-width:100%}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style></head><body>
+<title>Running Jam</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:ital,wdth,wght@0,62..125,400..900;1,62..125,400..900&family=Space+Mono:wght@400;700&display=swap">
 <style>
@@ -245,6 +246,11 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 .tSeg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--panel);border-radius:99px;padding:4px}
 .tSeg button{height:46px;min-width:52px;border-radius:99px;font-weight:800;color:var(--muted)}
 .tSeg button[aria-pressed="true"]{background:var(--paper);color:var(--ink)}
+.tEd{display:flex;align-items:center;gap:4px}
+.tIn{width:58px;height:56px;border-radius:16px;border:0;background:var(--panel2);color:var(--paper);font:400 34px/1 var(--display);text-align:center;padding:0}
+.tIn:focus{outline:3px solid var(--lime)}
+.tEd .tpMark{font-size:30px}
+#tPace{color:var(--paper);text-decoration:underline dotted 2px;text-underline-offset:6px}
 .tDone{height:56px;border-radius:99px;background:var(--paper);color:var(--ink);font:400 24px var(--display);text-transform:uppercase}
 .stats{grid-template-columns:repeat(4,1fr)}
 .calWrap{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:10px 0}
@@ -373,8 +379,8 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   <div id="pausedTag">Paused</div>
   <div id="dropTag" hidden></div>
   <div id="tune" hidden>
-    <div class="tRow"><span class="lbl">Pace</span><div class="tCtl"><button class="tB" id="tPm" aria-label="Slower pace">−</button><span class="disp tV" id="tPace">—</span><button class="tB" id="tPp" aria-label="Faster pace">+</button><button class="tS" id="tUse">Use now</button></div></div>
-    <div class="tRow"><span class="lbl">Sensitivity</span><div class="tCtl"><button class="tB" id="tSm" aria-label="Smoother">−</button><span class="disp tV" id="tSens">—</span><button class="tB" id="tSp" aria-label="Snappier">+</button></div></div>
+    <div class="tRow"><span class="lbl">Target</span><div class="tCtl" id="tPaceCtl"><button class="tB" id="tPm" aria-label="Slower pace">−</button><button class="disp tV" id="tPace" aria-label="Type your target pace">—</button><button class="tB" id="tPp" aria-label="Faster pace">+</button><button class="tS" id="tUse">Use now</button></div><div class="tEd" id="tPaceEd" hidden><input class="tIn" id="tMin" inputmode="numeric" pattern="[0-9]*" maxlength="2" aria-label="Minutes"><span class="tpMark">'</span><input class="tIn" id="tSec" inputmode="numeric" pattern="[0-9]*" maxlength="2" aria-label="Seconds"><span class="tpMark">"</span><button class="tS" id="tSet" style="background:var(--lime);color:var(--ink)">Set</button></div></div>
+    <div class="tRow"><span class="lbl">Music reacts</span><div class="tCtl"><button class="tB" id="tSm" aria-label="React slower">−</button><span class="disp tV" id="tSens">—</span><button class="tB" id="tSp" aria-label="React faster">+</button></div></div>
     <div class="tRow"><span class="lbl">Boost</span><div class="tSeg" id="tBoost"><button data-v="1">1×</button><button data-v="1.5">1.5×</button><button data-v="2">2×</button><button data-v="3">3×</button></div></div>
     <div class="tRow"><span class="lbl">Tempo</span><button class="tS wide" id="tLock">Lock current tempo</button></div>
     <button class="tDone" id="tDone">Done</button>
@@ -445,7 +451,7 @@ const idb = (() => {
 const settings = Object.assign({ source:'motion', sens:3, stretch:1, autoPause:true, sound:true, dj:'auto', manual:165, xfade:true, drops:true, engine:'smooth', paceMode:'pace', jumpFx:'random', tapeStop:true, units:'mi', height:165, weight:null, pace:null, range:null, boost:1, targetSpk:null, pull:true }, store.get('rj-settings', {}));
 const saveSettings = () => store.set('rj-settings', settings);
 if (!settings.v9){ settings.v9 = true; if (settings.engine === 'studio') settings.engine = 'smooth'; store.set('rj-settings', settings); }
-const SENS = [ {name:'Smoothest',n:12,tau:4}, {name:'Smooth',n:9,tau:2.5}, {name:'Balanced',n:7,tau:1.5}, {name:'Snappy',n:5,tau:.8}, {name:'Snappiest',n:3,tau:.4} ];
+const SENS = [ {name:'Slowest',n:12,tau:4}, {name:'Slow',n:9,tau:2.5}, {name:'Medium',n:7,tau:1.5}, {name:'Fast',n:5,tau:.8}, {name:'Fastest',n:3,tau:.4} ];
 const STRETCH = [ {name:'Tight', lo:.88, hi:1.12}, {name:'Normal', lo:.8, hi:1.25}, {name:'Wild', lo:.7, hi:1.4} ];
 const DJ = { auto:{name:'Auto-DJ', icon:'i-dj'}, build:{name:'Build up', icon:'i-build'}, shuffle:{name:'Shuffle', icon:'i-shuffle'}, order:{name:'In order', icon:'i-order'} };
 const SRC = { motion:{name:'Motion', icon:'i-motion'}, tap:{name:'Tap', icon:'i-tap'}, manual:{name:'Slider', icon:'i-slider'} };
@@ -772,9 +778,9 @@ const BUILTIN = [
 ];
 const crateMeta = store.get('rj-crate', {}); // {id:{on,bpm,order}}
 BUILTIN.forEach((b, i) => crate.push({ id:b.id, name:b.name, bpm:b.bpm, detected:b.bpm, builtin:b, dur:120, on:true, order:i }));
-function applyMeta(s){ const m = crateMeta[s.id]; if (m){ if (typeof m.on === 'boolean') s.on = m.on; if (m.bpm) s.bpm = m.bpm; if (typeof m.order === 'number') s.order = m.order; } }
+function applyMeta(s){ const m = crateMeta[s.id]; if (m){ if (typeof m.on === 'boolean') s.on = m.on; if (m.bpm) s.bpm = m.bpm; if (typeof m.order === 'number') s.order = m.order; if (typeof m.cue === 'number') s.cue = m.cue; } }
 crate.forEach(applyMeta);
-function saveMeta(){ crate.forEach(s => crateMeta[s.id] = { on:s.on, bpm:s.bpm, order:s.order }); store.set('rj-crate', crateMeta); }
+function saveMeta(){ crate.forEach(s => crateMeta[s.id] = { on:s.on, bpm:s.bpm, order:s.order, cue:s.cue }); store.set('rj-crate', crateMeta); }
 function colorOf(s){ const i = crate.indexOf(s); return SONG_COLORS[(i < 0 ? 0 : i) % SONG_COLORS.length]; }
 async function loadStoredSongs(){
   const rows = await idb.all();
@@ -846,6 +852,7 @@ function renderCrate(){
       '<span class="nm"><b></b><span class="sub"></span></span>';
     li.querySelector('b').textContent = s.name;
     li.querySelector('.sub').textContent = s.analyzing ? 'measuring…' : s.stream ? [s.artist, licName(s.lic)].filter(Boolean).join(' · ') : s.error ? 'can’t open this file' : (s.builtin ? 'built-in' : '') + (s.dur ? (s.builtin ? ' · ' : '') + fmtTime(s.dur) : '');
+    if (typeof s.cue === 'number') li.querySelector('.sub').textContent += ' · cue ' + fmtTime(s.cue);
     const inp = document.createElement('button'); inp.className = 'bpmIn'; inp.id = 'bpm-' + s.id; inp.textContent = s.bpm ? Math.round(s.bpm) : '—';
     inp.addEventListener('click', e => { e.stopPropagation(); if (!s.analyzing && !s.error) openBpm(s); });
     inp.disabled = !!s.analyzing || !!s.error; inp.setAttribute('aria-label', 'Tempo of ' + s.name + ': ' + (s.bpm ? Math.round(s.bpm) : 'unknown') + ' BPM. Tap to fix');
@@ -869,6 +876,7 @@ function openBpm(s){
     '<div class="lbl" style="color:var(--muted);margin:4px 0 14px">measured ' + (s.detected ? Math.round(s.detected) : '—') + ' BPM</div>' + (s.stream ? '<a class="credit" id="bpmCredit" target="_blank" rel="noopener"></a>' : '') +
     '<div class="seg" id="bpmMul"><button data-m="0.5">÷2</button><button data-m="0.6667">÷1.5</button><button data-m="1.5">×1.5</button><button data-m="2">×2</button></div>' +
     '<button id="tapPad" style="margin-top:12px">Tap along</button>' +
+    '<div class="set" style="margin:12px 0 0"><div class="hd" style="margin-bottom:8px"><b>Hot cue</b><span class="lbl" id="cueInfo" style="color:var(--muted)"></span></div><div class="row"><button class="btn" id="cueSet" style="flex:1;background:var(--lime);color:var(--ink)"><svg><use href="#i-fire"/></svg><span id="cueLbl"></span></button><button class="btn" id="cueClr" aria-label="Clear hot cue"><svg><use href="#i-x"/></svg></button></div><p class="lbl" style="color:var(--muted);margin:8px 0 0;line-height:1.5">mark the best part · a sprint or a drop jumps there mid-run</p></div>' +
     '<div class="row" style="margin-top:12px"><button class="btn" id="bpmReset">Reset</button><button class="btn pri" id="bpmSave"><svg><use href="#i-check"/></svg>Save</button></div>');
   $('bpmTitle').textContent = s.name;
   if (s.stream){ const a = $('bpmCredit'); a.href = s.page; a.textContent = 'By ' + (s.artist || 'Jamendo artist') + ' · ' + licName(s.lic) + ' · on Jamendo ↗'; }
@@ -877,10 +885,15 @@ function openBpm(s){
   $('tapPad').addEventListener('pointerdown', e => { e.preventDefault(); const t = performance.now(); if (taps.length && t - taps.at(-1) > 2000) taps.length = 0; taps.push(t); if (taps.length > 9) taps.shift();
     if (taps.length >= 4){ const iv = []; for (let i = 1; i < taps.length; i++) iv.push(taps[i] - taps[i - 1]); val = clamp(60000 / median(iv), 50, 220); show(); } $('tapPad').textContent = taps.length < 4 ? 'Tap ' + (4 - taps.length) + ' more' : 'Keep tapping'; });
   $('bpmReset').onclick = () => { val = s.detected || val; show(); };
+  let cue = typeof s.cue === 'number' ? s.cue : null;
+  const showCue = () => { $('cueInfo').textContent = cue != null ? 'at ' + fmtTime(cue) : 'not set'; $('cueLbl').textContent = pv.paused || !pv.src ? 'Play to find it' : 'Mark here'; $('cueClr').hidden = cue == null; };
+  const cueIv = setInterval(() => { if (!$('cueLbl')){ clearInterval(cueIv); return; } showCue(); }, 400); showCue();
+  $('cueSet').onclick = async () => { if (pv.paused || !pv.src){ $('pvBtn').click(); return; } cue = Math.max(0, Math.round(pv.currentTime * 10) / 10); showCue(); toast('i-fire', 'Hot cue at ' + fmtTime(cue)); };
+  $('cueClr').onclick = () => { cue = null; showCue(); };
   $('pvBtn').onclick = async () => { if (!pv.paused){ pv.pause(); $('pvBtn').innerHTML = '<svg class="i" style="width:28px;height:28px"><use href="#i-play"/></svg>'; return; }
     pv.src = await urlFor(s); if (s.dur && s.dur > 60) pv.currentTime = s.dur * .35; pv.play().catch(() => {}); $('pvBtn').innerHTML = '<svg class="i" style="width:28px;height:28px"><use href="#i-pause"/></svg>'; };
   $('shClose').onclick = () => { pv.pause(); closeSheet(); };
-  $('bpmSave').onclick = () => { s.bpm = Math.round(val * 10) / 10; saveSong(s); pv.pause(); closeSheet(); renderCrate(); renderUpNext(); toast('i-check', s.name.slice(0, 22) + ' · ' + Math.round(s.bpm) + ' BPM'); };
+  $('bpmSave').onclick = () => { s.bpm = Math.round(val * 10) / 10; if (cue != null) s.cue = cue; else delete s.cue; saveSong(s); pv.pause(); closeSheet(); renderCrate(); renderUpNext(); toast('i-check', s.name.slice(0, 22) + ' · ' + Math.round(s.bpm) + ' BPM'); };
 }
 $('scrim').addEventListener('click', () => pv.pause());
 
@@ -1002,7 +1015,7 @@ async function crossTo(s, secs){
   const from = D[active], to = D[1 - active];
   to.song = s;
   // start the new deck at the speed that fits the current pace
-  to.k = s.bpm ? kFor(settings.pace || Math.max(R.cad || 160, 150), s.bpm) : 1;
+  to.k = s.bpm ? kFor(Math.max(R.cad || settings.pace || 160, 100), s.bpm) : 1;
   to.rate = R.cad && s.bpm ? clamp(R.cad / (s.bpm * to.k), STRETCH[settings.stretch].lo, STRETCH[settings.stretch].hi) : 1;
   to.el.src = await urlFor(s); to.el.playbackRate = to.rate; to.el.preservesPitch = true; to.el.webkitPreservesPitch = true;
   to.gain.gain.value = 0;
@@ -1045,7 +1058,7 @@ async function startFlow(){
     DeviceMotionEvent.requestPermission().then(p => { if (p !== 'granted') R.motionDenied = true; }).catch(() => { R.motionDenied = true; });
   }
   keepAwake();
-  Object.assign(R, { state:'count', steps:0, songsDone:0, played:[], curve:[], cadSum:0, cadN:0, rate:1, k:null, cad:null, groove:[], grooveAvg:[], pausedMs:0, autoPaused:false, current:null, metric:0, lastCurve:0, xfUntil:0, drop:null, drops:[], nextDropAt:settings.dropFirst || 150, estDist:0, kcal:0, route:[], gpsDist:0, gpsOk:false, sensorWarned:false, locked:false, jumps:0, confetti:0, photos:[], camHold:0, pHist:[], pStatus:'warm', pRaw:'warm', pRawAt:0, pOn:0, pPace:null, pGap:null, pNext:0, kicks:0, kickAt:-99, cadHist:[], splits:[], nextSplit:UNIT().m, splitAt:0 });
+  Object.assign(R, { state:'count', steps:0, songsDone:0, played:[], curve:[], cadSum:0, cadN:0, rate:1, k:null, cad:null, groove:[], grooveAvg:[], pausedMs:0, autoPaused:false, current:null, metric:0, lastCurve:0, xfUntil:0, drop:null, drops:[], nextDropAt:settings.dropFirst || 150, estDist:0, kcal:0, route:[], gpsDist:0, gpsOk:false, sensorWarned:false, locked:false, jumps:0, confetti:0, photos:[], camHold:0, pHist:[], pStatus:'warm', pRaw:'warm', pRawAt:0, pOn:0, pPace:null, pGap:null, pNext:0, kicks:0, kickAt:-99, cadHist:[], splits:[], nextSplit:UNIT().m, splitAt:0, cueDone:{}, cueAt:-99 });
   $('tune').hidden = true;
   startGPS();
   intervals.length = 0; lastStep = 0; det.y = null; motionEvents = 0;
@@ -1092,15 +1105,27 @@ $('skipBtn').addEventListener('click', () => { if (R.state === 'running') skipSo
 $('sensorPill').addEventListener('click', e => { e.stopPropagation(); settings.source = 'tap'; saveSettings(); renderChips(); $('sensorPill').hidden = true; intervals.length = 0; toast('i-tap', 'Tap mode · tap the screen with each step'); });
 function renderTune(){
   $('tPace').textContent = settings.targetSpk ? paceStr(tgtUnit()) : settings.pace ? (settings.paceMode === 'pace' ? paceStr(paceFromCad(settings.pace)) : Math.round(settings.pace)) : '—';
-  $('tSens').textContent = SENS[settings.sens - 1].name.replace('est', '');
+  $('tSens').textContent = SENS[settings.sens - 1].name;
   $('tBoost').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.v === +settings.boost)));
   $('tLock').textContent = R.locked ? 'Tempo locked · tap to unlock' : 'Lock current tempo'; $('tLock').classList.toggle('on', !!R.locked);
 }
 $('tuneBtn').addEventListener('click', e => { e.stopPropagation(); $('tune').hidden = !$('tune').hidden; renderTune(); });
-$('tDone').addEventListener('click', () => { $('tune').hidden = true; });
-const nudgePace = dv => { const base = settings.pace || R.cad || avgCad() || 160; settings.pace = settings.paceMode === 'pace' ? cadFromPace(paceFromCad(base) - dv * 10 / 3) : clamp(Math.round(base + dv), 90, 210); if (settings.targetSpk) setTargetFromCad(settings.pace); saveSettings(); renderTune(); renderChips(); };
+$('tDone').addEventListener('click', () => { paceEdit(false); $('tune').hidden = true; });
+const nudgePace = dv => { const base = settings.pace || R.cad || avgCad() || 160; settings.pace = settings.paceMode === 'pace' ? cadFromPace(paceFromCad(base) - dv * 10 / 3) : clamp(Math.round(base + dv), 90, 210); if (settings.targetSpk) setTargetFromCad(settings.pace); saveSettings(); targetChanged(); renderTune(); renderChips(); };
+function targetChanged(){ D.forEach(d => { d.k = null; }); }
+function paceEdit(on){ $('tPaceCtl').hidden = on; $('tPaceEd').hidden = !on;
+  if (on){ const u = settings.targetSpk ? tgtUnit() : settings.pace ? paceFromCad(settings.pace) : null; $('tMin').value = u ? Math.floor(u / 60) : ''; $('tSec').value = u ? String(Math.round(u % 60) % 60).padStart(2, '0') : ''; $('tMin').focus(); $('tMin').select(); } }
+$('tPace').addEventListener('click', () => paceEdit(true));
+$('tMin').addEventListener('input', () => { if ($('tMin').value.length >= 2){ $('tSec').focus(); $('tSec').select(); } });
+['tMin', 'tSec'].forEach(id => $(id).addEventListener('keydown', e => { if (e.key === 'Enter') $('tSet').click(); }));
+$('tSet').addEventListener('click', () => { const m = parseInt($('tMin').value, 10), sc = parseInt($('tSec').value, 10);
+  if (isNaN(m)){ paceEdit(false); return; } const u = clamp(m * 60 + (isNaN(sc) ? 0 : clamp(sc, 0, 59)), 150, 40 * 60);
+  settings.targetSpk = Math.round(u * 1000 / UNIT().m * 100) / 100; settings.pace = Math.round(cadFromPace(u) * 10) / 10; settings.paceMode = 'pace'; saveSettings(); targetChanged();
+  try{ document.activeElement.blur(); }catch(e){} paceEdit(false); renderTune(); renderChips(); toast('i-bolt', 'Target ' + paceStr(u) + ' /' + UNIT().name); });
 $('tPm').addEventListener('click', () => nudgePace(-3)); $('tPp').addEventListener('click', () => nudgePace(3));
-$('tUse').addEventListener('click', () => { if (!R.cad) return toast('i-info', 'No steps yet'); settings.pace = Math.round(R.cad); setTargetFromCad(settings.pace); saveSettings(); renderTune(); renderChips(); toast('i-bolt', 'Target set · ' + paceStr(tgtUnit()) + ' /' + UNIT().name); });
+let useArm = 0;
+$('tUse').addEventListener('click', () => { if (!R.cad) return toast('i-info', 'No steps yet');
+  if (performance.now() - useArm > 3000){ useArm = performance.now(); toast('i-bolt', 'Tap again to set ' + paceStr(paceFromCad(R.cad)) + ' /' + UNIT().name); return; } useArm = 0; settings.pace = Math.round(R.cad); setTargetFromCad(settings.pace); saveSettings(); targetChanged(); renderTune(); renderChips(); toast('i-bolt', 'Target set · ' + paceStr(tgtUnit()) + ' /' + UNIT().name); });
 $('tSm').addEventListener('click', () => { settings.sens = clamp(settings.sens - 1, 1, 5); saveSettings(); renderTune(); });
 $('tSp').addEventListener('click', () => { settings.sens = clamp(settings.sens + 1, 1, 5); saveSettings(); renderTune(); });
 $('tBoost').querySelectorAll('button').forEach(b => b.addEventListener('click', () => { settings.boost = +b.dataset.v; saveSettings(); renderTune(); renderChips(); }));
@@ -1184,7 +1209,8 @@ function deckTarget(d, cad, st){
   const sg = d.song; if (!sg || !sg.bpm) return 1; if (!cad) return d.rate;
   // pick half/normal/double time once per song (from your set pace, or a running pace), then keep it,
   // so slowing down always slows the music and speeding up always speeds it up
-  if (!d.k) d.k = kFor(settings.pace || Math.max(cad, 150), sg.bpm);
+  // (picked from the tempo the music is aiming for now, not a stored pace, so a walking target can't lock a song at half time)
+  if (!d.k){ if (R.cad == null) return d.rate; d.k = kFor(Math.max(cad, 100), sg.bpm); }
   return clamp(cad / (sg.bpm * d.k), st.lo, st.hi);
 }
 let lastTick = performance.now();
@@ -1195,12 +1221,16 @@ setInterval(() => {
   const st = STRETCH[settings.stretch], t = runSecs();
   // a drop pushes the music ahead of you for 30 s; the target is fixed so it never runs away
   // boost: exaggerate changes around your set pace (or your average so far)
-  const basePace = settings.pace || avgCad() || R.cad;
-  let cadEff = R.cad != null ? (basePace ? basePace + (R.cad - basePace) * (settings.boost || 1) : R.cad) : (settings.pace || null);
+  // boost exaggerates your changes around your own average (capped at ±15% so it can't pin the music at its limit);
+  // with a target pace, the music sits halfway between your steps and the target, so changing the target moves it right away
+  const avg = avgCad() || R.cad; let cadEff = null;
+  if (R.cad != null){ cadEff = avg ? avg + clamp((R.cad - avg) * (settings.boost || 1), -avg * .15, avg * .15) : R.cad;
+    if (settings.targetSpk && settings.pace) cadEff = cadEff + (settings.pace - cadEff) * .5; }
+  else cadEff = settings.pace || null;
   let cadFor = R.drop && R.drop.phase === 'on' ? R.drop.base * 1.06 : cadEff;
   if (R.state === 'running') pacerTick(t, dt);
-  // pacer pull: when you fall behind, the music runs up to 6% ahead of your steps toward your target
-  if (settings.pull && R.pStatus === 'behind' && cadFor && settings.pace && settings.pace > cadFor) cadFor = Math.min(settings.pace, cadFor * 1.06);
+  // pacer pull: when you fall behind, the music runs up to 3% ahead (runners follow ~2.5% without noticing; Hej, Oct 2) of your steps toward your target
+  if (settings.pull && R.pStatus === 'behind' && cadFor && settings.pace && settings.pace > cadFor) cadFor = Math.min(settings.pace, cadFor * 1.03);
   // sensor check: say so right away when the motion sensor isn't reaching the page
   if (R.state === 'running' && settings.source === 'motion' && !R.sensorWarned && (R.motionDenied || (!motionEvents && t > 3))){ R.sensorWarned = true; $('sensorPill').hidden = false; }
   if (!$('sensorPill').hidden && (settings.source !== 'motion' || motionEvents > 20)) $('sensorPill').hidden = true;
@@ -1227,7 +1257,7 @@ setInterval(() => {
     // drops
     if (settings.drops && !R.drop && R.cad && t >= R.nextDropAt) startDrop(t);
     if (R.state === 'running' && settings.source === 'manual'){ R.stepAcc = (R.stepAcc || 0) + settings.manual / 60 * dt; while (R.stepAcc >= 1){ R.stepAcc--; R.steps++; addDistanceForStep(); } }
-    if (R.drop && R.drop.phase === 'riser' && t >= R.drop.at + 4){ R.drop.phase = 'on'; R.drop.until = t + 30; $('live').classList.add('drop'); setDropTag('DROP +6%'); }
+    if (R.drop && R.drop.phase === 'riser' && t >= R.drop.at + 4){ R.drop.phase = 'on'; R.drop.until = t + 30; $('live').classList.add('drop'); setDropTag('DROP +6%'); hotCue(t); }
     if (R.drop && R.drop.phase === 'on'){ if (R.cad){ R.drop.sum += R.cad; R.drop.n++; } if (t >= R.drop.until) endDrop(t); }
   }
   renderLive();
@@ -1247,7 +1277,8 @@ function pacerTick(t, dt){
   if (pace == null && R.cad) pace = paceFromCad(R.cad) * 1000 / UNIT().m;
   R.pPace = pace; R.pGap = t > 5 ? distNow() / 1000 * T - t : null;
   if (t < 20 || pace == null){ R.pStatus = 'warm'; return; }
-  const r = pace / T, raw = r > 1.05 ? 'behind' : r < .95 ? 'ahead' : 'on';
+  // one story: status = where you are against a pacer running your target the whole way
+  const g = R.pGap, raw = g == null ? 'on' : g > 5 ? 'ahead' : g < -5 ? 'behind' : 'on';
   if (raw !== R.pRaw){ R.pRaw = raw; R.pRawAt = t; }
   if (raw !== R.pStatus && (t - R.pRawAt >= 4 || R.pStatus === 'warm')){ const was = R.pStatus; R.pStatus = raw; if (was !== 'warm' || raw !== 'on') paceCue(raw); }
   if (R.pStatus === 'on' || R.pStatus === 'ahead') R.pOn += dt;
@@ -1269,14 +1300,24 @@ function kickCheck(t){
   const base = old.reduce((a, b) => a + b, 0) / old.length, now = h.slice(-3).map(p => p[1]).reduce((a, b) => a + b, 0) / 3;
   if (now >= base * 1.08 && now >= 140){ R.kickAt = t; R.kicks++; R.confetti = performance.now();
     if (settings.sound){ const c = ctx(); bigHit(c.currentTime + .01); airhorn(); }
-    toast('i-fire', 'KICK · +' + Math.round((now / base - 1) * 100) + '%');
+    toast('i-fire', 'KICK · +' + Math.round((now / base - 1) * 100) + '%'); hotCue(t);
     R.nextDropAt = Math.max(R.nextDropAt, t + 90); }
+}
+/* ---- hot cue: a sprint or a drop jumps to the part of the song you marked ---- */
+function hotCue(t){
+  const s = R.current, d = D[active]; if (!s || typeof s.cue !== 'number' || R.cueDone[s.id] || t - R.cueAt < 30) return;
+  const el = d.el, dur = el.duration; if (!dur || !isFinite(dur) || s.cue > dur - 15 || Math.abs(el.currentTime - s.cue) < 4) return;
+  R.cueDone[s.id] = true; R.cueAt = t; el.currentTime = s.cue; scratch();
+  setTimeout(() => toast('i-fire', 'HOT CUE · ' + s.name.slice(0, 22)), 900);
 }
 /* ---- splits: a chime every km / mile ---- */
 function splitCheck(t){
   const U = UNIT(); if (distNow() < R.nextSplit) return;
   const secs = t - R.splitAt; R.splits.push(Math.round(secs)); R.splitAt = t; R.nextSplit += U.m;
-  chime(); toast('i-pin', (U.name === 'mi' ? 'Mile ' : 'Km ') + R.splits.length + ' · ' + paceStr(secs));
+  // song-count callout (Hej, Sep 30): how many songs it took to get here
+  const sn = R.songsDone + 1, call = (U.name === 'mi' ? 'Mile ' : 'Km ') + R.splits.length + ' · ' + sn + (sn === 1 ? ' song!' : ' songs!');
+  chime(); toast('i-pin', 'Split · ' + paceStr(secs));
+  if (!R.drop){ setDropTag(call); clearTimeout(R.splitTagT); R.splitTagT = setTimeout(() => { if (!R.drop && $('dropTag').textContent === call) setDropTag(''); }, 4000); }
 }
 function startDrop(t){
   R.drop = { phase:'riser', at:t, base:R.cad, sum:0, n:0 };
@@ -1322,14 +1363,14 @@ function renderLive(){
   const pc = $('pacer'); pc.hidden = !settings.targetSpk;
   if (settings.targetSpk){ const st = R.pStatus, U = UNIT();
     pc.className = 'pacer ' + st;
-    $('pTag').textContent = st === 'warm' ? 'WARMING UP' : st === 'behind' ? (settings.pull ? 'PICK IT UP · PULL' : 'PICK IT UP') : st === 'ahead' ? 'AHEAD' : 'ON PACE';
+    $('pTag').textContent = st === 'warm' ? 'WARMING UP' : st === 'behind' ? 'BEHIND ' + fmtGap(R.pGap) : st === 'ahead' ? 'AHEAD ' + fmtGap(R.pGap) : 'ON PACE';
     $('pNow').textContent = R.pPace ? paceStr(R.pPace * U.m / 1000) : '—';
-    $('pGap').textContent = 'target ' + paceStr(tgtUnit()) + (R.pGap != null && Math.abs(R.pGap) >= 1 ? '\n' + fmtGap(R.pGap) + (R.pGap > 0 ? ' ahead' : ' behind') : '');
+    $('pGap').textContent = 'now\ntarget ' + paceStr(tgtUnit());
     $('pGap').style.whiteSpace = 'pre'; }
 }
 
 /* ================= visuals ================= */
-const vcv = $('vizCv'); let vw = 0, vh = 0, dpr = 1;
+const vcv = $('vizCv'); let vw = 0, vh = 0, dpr = 1, vTop = 60, vBot = 400, vMeas = 0;
 function sizeViz(){ dpr = Math.min(1.5, window.devicePixelRatio || 1); vw = window.innerWidth; vh = window.innerHeight; vcv.width = vw * dpr; vcv.height = vh * dpr; }
 window.addEventListener('resize', () => { if ($('live').classList.contains('on')) sizeViz(); drawDeck(); });
 const fbin = new Uint8Array(256), tbin = new Uint8Array(512);
@@ -1364,7 +1405,8 @@ function viz(now){
     c.lineTo(vw, vh); c.closePath(); c.fillStyle = col; c.fill();
   });
   // turntable
-  const R0 = Math.min(vw * .36, vh * .2), cx = vw / 2, cy = vh * .3;
+  if (now - vMeas > 500){ vMeas = now; try{ vTop = $('lSong').getBoundingClientRect().bottom + 8; vBot = $('metricBtn').getBoundingClientRect().top - 4; }catch(e){} }
+  const room = Math.max(120, vBot - vTop), R0 = Math.max(50, Math.min(vw * .36, (room / 2 - 6) / 1.68)), cx = vw / 2, cy = vTop + room / 2;
   // spectrum ring
   const bars = 72;
   for (let i = 0; i < bars; i++){
@@ -1679,7 +1721,7 @@ function startDance(cv, j){
   const ease = u => u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
   const limb = (x, y, a1, a2, l1, l2) => { const x1 = x + Math.sin(a1) * l1, y1 = y + Math.cos(a1) * l1, x2 = x1 + Math.sin(a1 + a2) * l2, y2 = y1 + Math.cos(a1 + a2) * l2; c.beginPath(); c.moveTo(x, y); c.lineTo(x1, y1); c.lineTo(x2, y2); c.stroke(); return [x2, y2]; };
   const frame = now => {
-    const tt = (now - t0) / 1000, b = tt / beat, i = Math.floor(b), u = ease(b - i), dancing = tt < 14;
+    const tt = Math.max(0, (now - t0) / 1000), b = tt / beat, i = Math.floor(b), u = ease(b - i), dancing = tt < 14;
     const pa = dancing ? P[seq[i % seq.length]] : P.stand, pb = dancing ? P[seq[(i + 1) % seq.length]] : P.stand;
     const q = pa.map((v, k) => v + (pb[k] - v) * u), idle = dancing ? 0 : Math.sin(tt * 2.2) * 1.5;
     c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, W, H);
@@ -1877,7 +1919,7 @@ function openSettings(){
     '<div class="set"><div class="hd"><b>Steps from</b></div>' + segHTML('sSrc', Object.entries(SRC).map(([k, v]) => [k, v.name, v.icon]), settings.source) +
       '<div id="manualBox" ' + (settings.source === 'manual' ? '' : 'hidden') + ' style="margin-top:12px"><div class="hd"><span class="lbl">pace</span><span class="disp" style="font-size:26px" id="manVal">' + settings.manual + '</span></div><input type="range" id="sMan" min="100" max="200" value="' + settings.manual + '"></div>' +
       '<div id="tapBox" ' + (settings.source === 'tap' ? '' : 'hidden') + ' style="margin-top:12px" class="lbl">tap anywhere on the run screen with each step</div></div>' +
-    '<div class="set"><div class="hd"><b>Sensitivity</b><span class="lbl" id="sensName">' + SENS[settings.sens - 1].name + '</span></div><input type="range" id="sSens" min="1" max="5" value="' + settings.sens + '"><div class="hd" style="margin:0"><span class="lbl" style="color:var(--muted)">smooth</span><span class="lbl" style="color:var(--muted)">snappy</span></div></div>' +
+    '<div class="set"><div class="hd"><b>Music reacts</b><span class="lbl" id="sensName">' + SENS[settings.sens - 1].name + '</span></div><input type="range" id="sSens" min="1" max="5" value="' + settings.sens + '" aria-label="How fast the music reacts"><div class="hd" style="margin:0"><span class="lbl" style="color:var(--muted)">slow · steady</span><span class="lbl" style="color:var(--muted)">fast · jumpy</span></div><p class="lbl" style="color:var(--muted);margin:8px 0 0;line-height:1.5">how quickly the music catches up when your step rate changes</p></div>' +
     '<div class="set"><div class="hd"><b>Boost</b><span class="lbl" style="color:var(--muted)" id="boostInfo"></span></div>' + segHTML('sBoost', [[1, '1×'], [1.5, '1.5×'], [2, '2×'], [3, '3×']], settings.boost) + '</div>' +
     '<div class="set"><div class="hd"><b>Stretch</b><span class="lbl" style="color:var(--muted)" id="strInfo"></span></div>' + segHTML('sStr', STRETCH.map((s, i) => [i, s.name]), settings.stretch) + '</div>' +
     '<div class="set"><div class="hd"><b>Song order</b></div>' + segHTML('sDj', Object.entries(DJ).map(([k, v]) => [k, v.name.replace('In order', 'Order').replace('Build up', 'Build'), null]), settings.dj) + '</div>' +
@@ -1926,8 +1968,9 @@ loadStoredSongs();
 initCrew();
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { renderJams(); drawDeck(); });
 
-window.__jam = { cheerLine, startDance, get pacer(){ return { st:R.pStatus, pace:R.pPace, gap:R.pGap, on:R.pOn, kicks:R.kicks, splits:R.splits }; }, get actx(){ return actx; }, get gainNode(){ return gainNode; }, get engine(){ return D[0].el.smooth ? 'smooth' : 'element'; }, savePhoto, photoImg, paintCover, onJump, JMP, CAL, openPaceSetup, drawRoute:null, D, get active(){ return active; }, openBpm, detectBPM, synthTrack, drawCover, R, crate, settings, registerStep, finishRun, showSummary, openJam, loadJams, saveJams, showView, renderJams };
+window.__jam = { hotCue, cheerLine, startDance, get pacer(){ return { st:R.pStatus, pace:R.pPace, gap:R.pGap, on:R.pOn, kicks:R.kicks, splits:R.splits }; }, get actx(){ return actx; }, get gainNode(){ return gainNode; }, get engine(){ return D[0].el.smooth ? 'smooth' : 'element'; }, savePhoto, photoImg, paintCover, onJump, JMP, CAL, openPaceSetup, drawRoute:null, D, get active(){ return active; }, openBpm, detectBPM, synthTrack, drawCover, R, crate, settings, registerStep, finishRun, showSummary, openJam, loadJams, saveJams, showView, renderJams };
 })();
 </script>
+
 
 </body></html>
