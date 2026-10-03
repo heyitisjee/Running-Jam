@@ -1,7 +1,6 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0E0E0E"><style>*{margin:0}[hidden]{display:none!important}body{margin:0}img{max-width:100%}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style></head><body>
-<title>Running Jam</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0E0E0E"><style>*{margin:0}[hidden]{display:none!important}body{margin:0}img{max-width:100%}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style></head><body><title>Songtui</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:ital,wdth,wght@0,62..125,400..900;1,62..125,400..900&family=Space+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:ital,wdth,wght@0,62..125,400..900;1,62..125,400..900&family=Space+Mono:wght@400;700&family=Grand+Hotel&display=swap">
 <style>
 :root{
   color-scheme:dark;
@@ -10,8 +9,18 @@
   --display:"Anton","Impact","Arial Narrow Bold",sans-serif;
   --body:"Archivo","Helvetica Neue",Arial,sans-serif;
   --mono:"Space Mono",ui-monospace,Menlo,monospace;
-  --tabH:68px;
+  --tabH:68px; --fg:#F4F1E8; --logoBg:#262626;
 }
+/* Day mode (Oct 3): cream + pastels; Night = the original bold colors */
+html.day{color-scheme:light;--ink:#2B1D17;--paper:#FFF6EA;--fg:#2B1D17;--panel:#F3E9DA;--panel2:#E9DDC9;--muted:#6E5E52;--line:#D9CBB5;--logoBg:#2B1D17;
+  --orange:#FFC4A3;--lime:#F6E3A6;--mint:#C4EBD5;--peri:#D9CCFF;--pink:#F7C6D3;--sky:#B9D3F2;--sand:#EAD9BC;--red:#F4A9A0}
+html.day,html.day body{background:var(--paper);color:var(--fg)}
+html.day #live,html.day #sum,html.day #count,html.day #tune{--panel:#3D2B23;--panel2:#4A3529;--muted:#CBBBAE;--line:#4A3529;--fg:#FFF6EA}
+html.day .tabs{background:linear-gradient(to top,var(--paper) 75%,rgba(255,246,234,0))}
+html.day .tabsIn{background:var(--ink)} html.day .tab{color:#CBBBAE} html.day .tab[aria-selected="true"]{color:var(--ink)}
+html.day .tpIn,html.day .compose input,html.day .nameIn,html.day .emptyBox .disp{color:var(--fg)}
+html.day .credit{color:var(--fg)}
+html.day .goBtn{box-shadow:0 0 0 8px rgba(255,196,163,.45)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
 html{background:var(--ink)}
@@ -26,7 +35,7 @@ svg.i{width:24px;height:24px;flex:none}
 #app{height:100%;display:flex;flex-direction:column;max-width:560px;margin:0 auto}
 .top{display:flex;align-items:center;gap:10px;padding:10px 16px 6px}
 .top .logo{width:34px;height:34px}
-.word{font-weight:900;font-style:italic;font-stretch:68%;font-size:24px;text-transform:uppercase;letter-spacing:-.01em}
+.word{font-family:"Grand Hotel",cursive;font-weight:400;font-size:32px;line-height:1;letter-spacing:0}
 .top .sp{flex:1}
 .round{width:44px;height:44px;border-radius:50%;background:var(--panel2);display:inline-flex;align-items:center;justify-content:center}
 .views{flex:1;min-height:0;position:relative;isolation:isolate}
@@ -265,6 +274,17 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 .toast.on{transform:translate(-50%,0);visibility:visible}
 .toast svg{width:18px;height:18px}
 
+/* vibe + km card (v0.15) */
+.vibe{pointer-events:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:rgba(0,0,0,.16);border-radius:99px;padding:4px;width:100%;max-width:340px;margin:0 auto 12px}
+.vibe button{height:50px;border-radius:99px;font:400 21px var(--display);text-transform:uppercase;color:var(--ink);opacity:.62}
+.vibe button[aria-pressed="true"]{background:var(--ink);color:var(--paper);opacity:1}
+#kmCard{position:absolute;inset:0;z-index:4;background:var(--ink);color:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;pointer-events:none;padding:24px}
+#kmCard[hidden]{display:none}
+#kmCard.on{animation:pop .7s cubic-bezier(.2,.9,.2,1)}
+#kmBig{font-family:var(--display);font-size:clamp(96px,34vw,190px);line-height:.85;white-space:nowrap}
+#kmSub{font-family:"Grand Hotel",cursive;font-size:46px;line-height:1;color:var(--lime)}
+#kmVs{font:700 13px var(--mono);letter-spacing:.1em;text-transform:uppercase;opacity:.8}
+.firstTip{text-align:center;color:var(--muted);font-size:14px;line-height:1.4;margin:-6px 8px 0}
 /* summary */
 #sum{background:var(--ink);overflow-y:auto}
 .sumIn{max-width:520px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top,0px)) 18px calc(24px + env(safe-area-inset-bottom,0px))}
@@ -305,11 +325,8 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 
 <div id="app">
   <header class="top">
-    <svg class="logo" viewBox="0 0 40 40" aria-hidden="true">
-      <circle cx="20" cy="20" r="19" fill="#FF5A1F"/><circle cx="20" cy="20" r="11.5" fill="none" stroke="#0E0E0E" stroke-width="3"/><circle cx="20" cy="20" r="3.5" fill="#0E0E0E"/>
-      <path d="M1.5 25h9l4-10 6.5 17 4-10h13.5" fill="none" stroke="#F4F1E8" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <span class="word">Running Jam</span>
+    <svg class="logo" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="50" style="fill:var(--logoBg)"/><rect x="14" y="30" width="72" height="40" rx="20" fill="none" style="stroke:var(--sky)" stroke-width="6"/><circle cx="50" cy="50" r="10" style="fill:var(--lime)"/><circle cx="66" cy="30" r="6" style="fill:var(--orange)"/></svg>
+    <span class="word">Songtui</span>
     <span class="sp"></span>
     <button class="round" id="setBtn" aria-label="Settings"><svg class="i"><use href="#i-gear"/></svg></button>
   </header>
@@ -328,6 +345,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
           <button class="chip sky" id="chipPace" aria-label="Your pace"><svg><use href="#i-bolt"/></svg><span>Set pace</span></button>
         </div>
         <div class="upnext" id="upnext"></div>
+        <p class="firstTip" id="firstTip" hidden>First run? Just press GO and start walking. In about 20 seconds the music finds your step.</p>
       </div>
     </section>
 
@@ -378,10 +396,11 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   <canvas id="vizCv" aria-hidden="true"></canvas>
   <div id="pausedTag">Paused</div>
   <div id="dropTag" hidden></div>
+  <div id="kmCard" hidden><span id="kmBig">KM 1</span><span id="kmSub"></span><span id="kmVs"></span></div>
   <div id="tune" hidden>
     <div class="tRow"><span class="lbl">Target</span><div class="tCtl" id="tPaceCtl"><button class="tB" id="tPm" aria-label="Slower pace">−</button><button class="disp tV" id="tPace" aria-label="Type your target pace">—</button><button class="tB" id="tPp" aria-label="Faster pace">+</button><button class="tS" id="tUse">Use now</button></div><div class="tEd" id="tPaceEd" hidden><input class="tIn" id="tMin" inputmode="numeric" pattern="[0-9]*" maxlength="2" aria-label="Minutes"><span class="tpMark">'</span><input class="tIn" id="tSec" inputmode="numeric" pattern="[0-9]*" maxlength="2" aria-label="Seconds"><span class="tpMark">"</span><button class="tS" id="tSet" style="background:var(--lime);color:var(--ink)">Set</button></div></div>
-    <div class="tRow"><span class="lbl">Music reacts</span><div class="tCtl"><button class="tB" id="tSm" aria-label="React slower">−</button><span class="disp tV" id="tSens">—</span><button class="tB" id="tSp" aria-label="React faster">+</button></div></div>
-    <div class="tRow"><span class="lbl">Boost</span><div class="tSeg" id="tBoost"><button data-v="1">1×</button><button data-v="1.5">1.5×</button><button data-v="2">2×</button><button data-v="3">3×</button></div></div>
+    <div class="tRow"><span class="lbl">Pace step</span><div class="tCtl"><button class="tB" id="tSm" aria-label="Smaller pace step">−</button><span class="disp tV" id="tSens">—</span><button class="tB" id="tSp" aria-label="Bigger pace step">+</button></div></div>
+    <div class="tRow"><span class="lbl">Tempo step</span><div class="tCtl"><button class="tB" id="tTm" aria-label="Smaller tempo step">−</button><span class="disp tV" id="tTst">—</span><button class="tB" id="tTp" aria-label="Bigger tempo step">+</button></div></div>
     <div class="tRow"><span class="lbl">Tempo</span><button class="tS wide" id="tLock">Lock current tempo</button></div>
     <button class="tDone" id="tDone">Done</button>
   </div>
@@ -397,6 +416,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     </button>
     <div class="pacer warm" id="pacer" hidden><span class="pTag" id="pTag">WARMING UP</span><span class="pNow" id="pNow">—</span><span class="pGap" id="pGap"></span></div>
     <div class="groove"><span class="lbl">Groove</span><span class="bar"><i id="grooveBar"></i></span></div>
+    <div class="vibe" id="vibe" role="group" aria-label="Vibe"><button data-v="chill">Chill</button><button data-v="groove">Groove</button><button data-v="hype">Hype</button></div>
     <div class="ctrls">
       <div class="holdWrap">
         <button class="cbtn" id="stopBtn" aria-label="Hold to end run"><svg><use href="#i-stop"/></svg></button>
@@ -406,7 +426,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
       <button class="cbtn" id="skipBtn" aria-label="Skip song"><svg><use href="#i-skip"/></svg></button>
       <label class="cbtn" id="camBtn" aria-label="Take a photo for your cover"><svg><use href="#i-cam"/></svg><input type="file" id="camIn" accept="image/*" capture="environment" style="position:absolute;width:1px;height:1px;opacity:0"></label>
     </div>
-    <div class="lbl holdHint" id="holdHint">Hold ■ to finish</div>
+    <div class="lbl holdHint" id="holdHint">Hold ■ to finish · 2× tap: drop · swipe: skip</div>
   </div>
 </div>
 
@@ -448,13 +468,20 @@ const idb = (() => {
   };
 })();
 
-const settings = Object.assign({ source:'motion', sens:3, stretch:1, autoPause:true, sound:true, dj:'auto', manual:165, xfade:true, drops:true, engine:'smooth', paceMode:'pace', jumpFx:'random', tapeStop:true, units:'mi', height:165, weight:null, pace:null, range:null, boost:1, targetSpk:null, pull:true }, store.get('rj-settings', {}));
+const settings = Object.assign({ source:'motion', sens:3, stretch:1, autoPause:true, sound:true, dj:'auto', manual:165, xfade:true, drops:true, engine:'smooth', paceMode:'pace', jumpFx:'random', tapeStop:true, units:'mi', height:165, weight:null, pace:null, range:null, boost:1, targetSpk:null, pull:true, theme:'auto', voice:true, vibe:null, paceStep:2, tempoStep:1, slowSpk:null, fastSpk:null }, store.get('rj-settings', {}));
 const saveSettings = () => store.set('rj-settings', settings);
 if (!settings.v9){ settings.v9 = true; if (settings.engine === 'studio') settings.engine = 'smooth'; store.set('rj-settings', settings); }
 const SENS = [ {name:'Slowest',n:12,tau:4}, {name:'Slow',n:9,tau:2.5}, {name:'Medium',n:7,tau:1.5}, {name:'Fast',n:5,tau:.8}, {name:'Fastest',n:3,tau:.4} ];
 const STRETCH = [ {name:'Tight', lo:.88, hi:1.12}, {name:'Normal', lo:.8, hi:1.25}, {name:'Wild', lo:.7, hi:1.4} ];
 const DJ = { auto:{name:'Auto-DJ', icon:'i-dj'}, build:{name:'Build up', icon:'i-build'}, shuffle:{name:'Shuffle', icon:'i-shuffle'}, order:{name:'In order', icon:'i-order'} };
 const SRC = { motion:{name:'Motion', icon:'i-motion'}, tap:{name:'Tap', icon:'i-tap'}, manual:{name:'Slider', icon:'i-slider'} };
+/* Day / Night look (Oct 3): Auto = Day from 6 AM to 5 PM */
+const DAYPAL = { orange:'#FFC4A3', lime:'#F6E3A6', mint:'#C4EBD5', peri:'#D9CCFF', pink:'#F7C6D3', sky:'#B9D3F2', sand:'#EAD9BC', red:'#F4A9A0', paper:'#FFF6EA', ink:'#2B1D17' };
+function isDay(){ if (settings.theme === 'day') return true; if (settings.theme === 'night') return false; const h = new Date().getHours(); return h >= 6 && h < 17; }
+const UI = k => (isDay() ? DAYPAL : PAL)[k];
+function applyTheme(){ document.documentElement.classList.toggle('day', isDay()); }
+/* Vibe: one choice instead of Music reacts + Boost + Stretch */
+const VIBES = { chill:{ sens:2, boost:1, stretch:0, paceStep:3, tempoStep:1, say:'Chill · every 3" of pace moves the music 1%' }, groove:{ sens:3, boost:1, stretch:1, paceStep:2, tempoStep:1, say:'Groove · every 2" of pace moves the music 1%' }, hype:{ sens:4, boost:1, stretch:2, paceStep:2, tempoStep:2, say:'Hype · every 2" of pace moves the music 2%' } };
 
 /* ================= audio core ================= */
 let actx = null, gainNode = null, analyser = null, fxBus = null, routed = false;
@@ -847,7 +874,7 @@ $('editBtn').addEventListener('click', () => { editing = !editing; $('editBtn').
 function renderCrate(){
   const ul = $('crate'); ul.innerHTML = ''; ul.parentElement.classList.toggle('editing', editing);
   crate.forEach((s, i) => {
-    const li = document.createElement('li'); li.className = 'pill' + (s.on ? '' : ' off'); li.style.background = PAL[colorOf(s)]; li.style.zIndex = String(100 - i);
+    const li = document.createElement('li'); li.className = 'pill' + (s.on ? '' : ' off'); li.style.background = UI(colorOf(s)); li.style.zIndex = String(100 - i);
     li.innerHTML = '<span class="ic"><svg><use href="#' + (s.analyzing ? 'i-dj' : s.on ? 'i-check' : 'i-x') + '"/></svg></span>' +
       '<span class="nm"><b></b><span class="sub"></span></span>';
     li.querySelector('b').textContent = s.name;
@@ -992,10 +1019,10 @@ function upNextSong(){ if (settings.dj === 'order' || settings.dj === 'build'){ 
 
 function onNewSong(s){
   R.current = s; R.color = colorOf(s);
-  $('live').style.background = PAL[R.color];
+  $('live').style.background = UI(R.color);
   $('lSong').textContent = s.name;
   R.played.push({ id:s.id, name:s.name, bpm:s.bpm, at:runSecs() });
-  try{ if ('mediaSession' in navigator && window.MediaMetadata) navigator.mediaSession.metadata = new MediaMetadata({ title:s.name, artist:s.artist || 'Running Jam', album:Math.round(s.bpm) + ' BPM' }); }catch(e){}
+  try{ if ('mediaSession' in navigator && window.MediaMetadata) navigator.mediaSession.metadata = new MediaMetadata({ title:s.name, artist:s.artist || 'Songtui', album:Math.round(s.bpm) + ' BPM' }); }catch(e){}
 }
 // hard start on the active deck (first song, or when crossfades aren't available)
 async function playSong(s){
@@ -1057,8 +1084,9 @@ async function startFlow(){
   if (settings.source === 'motion' && typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function'){
     DeviceMotionEvent.requestPermission().then(p => { if (p !== 'granted') R.motionDenied = true; }).catch(() => { R.motionDenied = true; });
   }
+  try{ if (window.speechSynthesis && typeof SpeechSynthesisUtterance !== 'undefined'){ const u0 = new SpeechSynthesisUtterance(' '); u0.volume = 0; speechSynthesis.speak(u0); } }catch(e){}
   keepAwake();
-  Object.assign(R, { state:'count', steps:0, songsDone:0, played:[], curve:[], cadSum:0, cadN:0, rate:1, k:null, cad:null, groove:[], grooveAvg:[], pausedMs:0, autoPaused:false, current:null, metric:0, lastCurve:0, xfUntil:0, drop:null, drops:[], nextDropAt:settings.dropFirst || 150, estDist:0, kcal:0, route:[], gpsDist:0, gpsOk:false, sensorWarned:false, locked:false, jumps:0, confetti:0, photos:[], camHold:0, pHist:[], pStatus:'warm', pRaw:'warm', pRawAt:0, pOn:0, pPace:null, pGap:null, pNext:0, kicks:0, kickAt:-99, cadHist:[], splits:[], nextSplit:UNIT().m, splitAt:0, cueDone:{}, cueAt:-99 });
+  Object.assign(R, { state:'count', steps:0, songsDone:0, played:[], curve:[], cadSum:0, cadN:0, rate:1, k:null, cad:null, groove:[], grooveAvg:[], pausedMs:0, autoPaused:false, current:null, metric:0, lastCurve:0, xfUntil:0, drop:null, drops:[], nextDropAt:settings.dropFirst || 150, estDist:0, kcal:0, route:[], gpsDist:0, gpsOk:false, sensorWarned:false, locked:false, jumps:0, confetti:0, photos:[], camHold:0, pHist:[], pStatus:'warm', pRaw:'warm', pRawAt:0, pOn:0, pPace:null, pGap:null, pNext:0, kicks:0, kickAt:-99, cadHist:[], splits:[], nextSplit:UNIT().m, splitAt:0, cueDone:{}, cueAt:-99, ref:null, pStep:null });
   $('tune').hidden = true;
   startGPS();
   intervals.length = 0; lastStep = 0; det.y = null; motionEvents = 0;
@@ -1104,15 +1132,14 @@ function skipSong(){ scratch(); crossTo(pickNext(), 1.2); }
 $('skipBtn').addEventListener('click', () => { if (R.state === 'running') skipSong(); });
 $('sensorPill').addEventListener('click', e => { e.stopPropagation(); settings.source = 'tap'; saveSettings(); renderChips(); $('sensorPill').hidden = true; intervals.length = 0; toast('i-tap', 'Tap mode · tap the screen with each step'); });
 function renderTune(){
-  $('tPace').textContent = settings.targetSpk ? paceStr(tgtUnit()) : settings.pace ? (settings.paceMode === 'pace' ? paceStr(paceFromCad(settings.pace)) : Math.round(settings.pace)) : '—';
-  $('tSens').textContent = SENS[settings.sens - 1].name;
-  $('tBoost').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.v === +settings.boost)));
+  $('tPace').textContent = settings.targetSpk ? paceStr(tgtUnit()) : settings.pace ? paceStr(paceFromCad(settings.pace)) : '—';
+  $('tSens').textContent = (settings.paceStep || 2) + '"'; $('tTst').textContent = (settings.tempoStep || 1) + '%';
   $('tLock').textContent = R.locked ? 'Tempo locked · tap to unlock' : 'Lock current tempo'; $('tLock').classList.toggle('on', !!R.locked);
 }
 $('tuneBtn').addEventListener('click', e => { e.stopPropagation(); $('tune').hidden = !$('tune').hidden; renderTune(); });
 $('tDone').addEventListener('click', () => { paceEdit(false); $('tune').hidden = true; });
 const nudgePace = dv => { const base = settings.pace || R.cad || avgCad() || 160; settings.pace = settings.paceMode === 'pace' ? cadFromPace(paceFromCad(base) - dv * 10 / 3) : clamp(Math.round(base + dv), 90, 210); if (settings.targetSpk) setTargetFromCad(settings.pace); saveSettings(); targetChanged(); renderTune(); renderChips(); };
-function targetChanged(){ D.forEach(d => { d.k = null; }); }
+function targetChanged(){ D.forEach(d => { d.k = null; }); R.ref = null; R.pStep = null; }
 function paceEdit(on){ $('tPaceCtl').hidden = on; $('tPaceEd').hidden = !on;
   if (on){ const u = settings.targetSpk ? tgtUnit() : settings.pace ? paceFromCad(settings.pace) : null; $('tMin').value = u ? Math.floor(u / 60) : ''; $('tSec').value = u ? String(Math.round(u % 60) % 60).padStart(2, '0') : ''; $('tMin').focus(); $('tMin').select(); } }
 $('tPace').addEventListener('click', () => paceEdit(true));
@@ -1126,9 +1153,10 @@ $('tPm').addEventListener('click', () => nudgePace(-3)); $('tPp').addEventListen
 let useArm = 0;
 $('tUse').addEventListener('click', () => { if (!R.cad) return toast('i-info', 'No steps yet');
   if (performance.now() - useArm > 3000){ useArm = performance.now(); toast('i-bolt', 'Tap again to set ' + paceStr(paceFromCad(R.cad)) + ' /' + UNIT().name); return; } useArm = 0; settings.pace = Math.round(R.cad); setTargetFromCad(settings.pace); saveSettings(); targetChanged(); renderTune(); renderChips(); toast('i-bolt', 'Target set · ' + paceStr(tgtUnit()) + ' /' + UNIT().name); });
-$('tSm').addEventListener('click', () => { settings.sens = clamp(settings.sens - 1, 1, 5); saveSettings(); renderTune(); });
-$('tSp').addEventListener('click', () => { settings.sens = clamp(settings.sens + 1, 1, 5); saveSettings(); renderTune(); });
-$('tBoost').querySelectorAll('button').forEach(b => b.addEventListener('click', () => { settings.boost = +b.dataset.v; saveSettings(); renderTune(); renderChips(); }));
+$('tSm').addEventListener('click', () => { settings.paceStep = clamp((settings.paceStep || 2) - 1, 1, 10); settings.vibe = null; renderVibe(); saveSettings(); renderTune(); });
+$('tTm').addEventListener('click', () => { settings.tempoStep = clamp((settings.tempoStep || 1) - 1, 1, 5); settings.vibe = null; renderVibe(); saveSettings(); renderTune(); });
+$('tTp').addEventListener('click', () => { settings.tempoStep = clamp((settings.tempoStep || 1) + 1, 1, 5); settings.vibe = null; renderVibe(); saveSettings(); renderTune(); });
+$('tSp').addEventListener('click', () => { settings.paceStep = clamp((settings.paceStep || 2) + 1, 1, 10); settings.vibe = null; renderVibe(); saveSettings(); renderTune(); });
 $('tLock').addEventListener('click', () => { R.locked = !R.locked; renderTune(); toast(R.locked ? 'i-stop' : 'i-bolt', R.locked ? 'Tempo locked' : 'Following your steps again'); });
 $('metricBtn').addEventListener('click', () => { R.metric = (R.metric + 1) % 6; renderLive(); });
 
@@ -1149,7 +1177,7 @@ function finishRun(){
   if (gainNode) fadeTo(0, .4); setTimeout(() => { D.forEach(d => d.el.pause()); if (keepAlive) keepAlive.pause(); }, 420);
   if (R.drop) endDrop(runSecs());
   try{ wakeLock && wakeLock.release(); }catch(e){}
-  stopGPS(); $('sensorPill').hidden = true; $('tune').hidden = true;
+  stopGPS(); $('sensorPill').hidden = true; $('tune').hidden = true; $('kmCard').hidden = true; try{ window.speechSynthesis && speechSynthesis.cancel(); }catch(e){}
   $('live').classList.remove('on', 'paused');
   const g = R.grooveAvg.length ? Math.round(R.grooveAvg.reduce((a, b) => a + b, 0) / R.grooveAvg.length) : null;
   const avg = avgCad();
@@ -1223,9 +1251,20 @@ setInterval(() => {
   // boost: exaggerate changes around your set pace (or your average so far)
   // boost exaggerates your changes around your own average (capped at ±15% so it can't pin the music at its limit);
   // with a target pace, the music sits halfway between your steps and the target, so changing the target moves it right away
-  const avg = avgCad() || R.cad; let cadEff = null;
-  if (R.cad != null){ cadEff = avg ? avg + clamp((R.cad - avg) * (settings.boost || 1), -avg * .15, avg * .15) : R.cad;
-    if (settings.targetSpk && settings.pace) cadEff = cadEff + (settings.pace - cadEff) * .5; }
+  let cadEff = null;
+  // pace steps (Hej, Oct 3): every <paceStep>" your pace moves, the music moves <tempoStep>%,
+  // measured from where you started (or your target pace), and never past your slowest / fastest pace limits
+  if (R.cad != null){
+    if (!R.ref && intervals.length >= 6) R.ref = settings.targetSpk && settings.pace ? { cad:settings.pace, pace:tgtUnit() } : { cad:R.cad, pace:paceFromCad(R.cad) };
+    if (R.ref){
+      // pace by beat: your pace moves with your step rate from the starting point (stride held steady), so it can't jump around
+      const k = UNIT().m / 1000; let p = R.ref.pace * R.ref.cad / R.cad;
+      if (settings.slowSpk) p = Math.min(p, settings.slowSpk * k); if (settings.fastSpk) p = Math.max(p, settings.fastSpk * k);
+      const raw = (R.ref.pace - p) / (settings.paceStep || 2);
+      if (R.pStep == null || Math.abs(raw - R.pStep) > .6) R.pStep = clamp(Math.round(raw), -30, 30);
+      cadEff = R.ref.cad * (1 + R.pStep * (settings.tempoStep || 1) / 100);
+    } else cadEff = R.cad;
+  }
   else cadEff = settings.pace || null;
   let cadFor = R.drop && R.drop.phase === 'on' ? R.drop.base * 1.06 : cadEff;
   if (R.state === 'running') pacerTick(t, dt);
@@ -1234,7 +1273,7 @@ setInterval(() => {
   // sensor check: say so right away when the motion sensor isn't reaching the page
   if (R.state === 'running' && settings.source === 'motion' && !R.sensorWarned && (R.motionDenied || (!motionEvents && t > 3))){ R.sensorWarned = true; $('sensorPill').hidden = false; }
   if (!$('sensorPill').hidden && (settings.source !== 'motion' || motionEvents > 20)) $('sensorPill').hidden = true;
-  const a = 1 - Math.exp(-dt / SENS[settings.sens - 1].tau);
+  const a = 1 - Math.exp(-dt / .8); // steps glide in under a second
   D.forEach(d => { if (!d.song) return; const target = R.state === 'running' && !R.locked ? deckTarget(d, cadFor, st) : d.rate;
     d.rate += a * (target - d.rate);
     // iPhone's time-stretcher glitches on every speed change, so change it rarely and in 1% steps
@@ -1317,7 +1356,28 @@ function splitCheck(t){
   // song-count callout (Hej, Sep 30): how many songs it took to get here
   const sn = R.songsDone + 1, call = (U.name === 'mi' ? 'Mile ' : 'Km ') + R.splits.length + ' · ' + sn + (sn === 1 ? ' song!' : ' songs!');
   chime(); toast('i-pin', 'Split · ' + paceStr(secs));
-  if (!R.drop){ setDropTag(call); clearTimeout(R.splitTagT); R.splitTagT = setTimeout(() => { if (!R.drop && $('dropTag').textContent === call) setDropTag(''); }, 4000); }
+  const n = R.splits.length, prev = n > 1 ? R.splits[n - 2] : null;
+  const vs = prev == null ? '' : secs < prev - 3 ? 'faster than the last one' : secs > prev + 3 ? 'a bit slower than the last one' : 'same as the last one';
+  showKm((U.name === 'mi' ? 'MILE ' : 'KM ') + n, sn + (sn === 1 ? ' song in' : ' songs in') + ' · ' + paceStr(secs), vs);
+  // voice DJ (Hej, Oct 3): say it out loud over a dip in the music
+  const unit = U.name === 'mi' ? 'mile' : 'kilometer', mm = Math.floor(secs / 60), ss = Math.round(secs % 60);
+  say(n + ' ' + unit + (n > 1 ? 's' : '') + '. ' + sn + (sn === 1 ? ' song' : ' songs') + ' in. Pace ' + mm + ' minutes ' + ss + '.' + (vs ? ' ' + vs.charAt(0).toUpperCase() + vs.slice(1) + '.' : ''));
+}
+function showKm(big, sub, vs){
+  const c = $('kmCard'); $('kmBig').textContent = big; $('kmSub').textContent = sub; $('kmVs').textContent = vs || '';
+  c.hidden = false; c.classList.remove('on'); void c.offsetWidth; c.classList.add('on');
+  clearTimeout(R.kmT); R.kmT = setTimeout(() => { c.hidden = true; }, 4000);
+}
+function say(text){
+  R.lastSaid = text;
+  if (settings.voice === false || !('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') return;
+  try{
+    const u = new SpeechSynthesisUtterance(text); u.rate = 1.02; u.lang = 'en-US';
+    const back = () => { clearTimeout(R.duckT); if (R.state === 'running' && gainNode) fadeTo(1, .6); };
+    u.onend = back; u.onerror = back;
+    if (gainNode) fadeTo(.35, .25); R.duckT = setTimeout(back, 7000);
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  }catch(e){}
 }
 function startDrop(t){
   R.drop = { phase:'riser', at:t, base:R.cad, sum:0, n:0 };
@@ -1415,7 +1475,7 @@ function viz(now){
     c.strokeStyle = i % 2 ? 'rgba(14,14,14,.85)' : 'rgba(244,241,232,.9)'; c.lineWidth = Math.max(3, R0 * .045); c.lineCap = 'round';
     c.beginPath(); c.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1); c.lineTo(cx + Math.cos(a) * r2, cy + Math.sin(a) * r2); c.stroke();
   }
-  drawRecord(c, cx, cy, R0 * (1 + smooth.bass * .04), R.angle, PAL[SONG_COLORS[(SONG_COLORS.indexOf(R.color) + 2) % SONG_COLORS.length]], true);
+  drawRecord(c, cx, cy, R0 * (1 + smooth.bass * .04), R.angle, UI(SONG_COLORS[(SONG_COLORS.indexOf(R.color) + 2) % SONG_COLORS.length]), true);
   // tonearm
   c.save(); c.translate(cx + R0 * 1.08, cy - R0 * 1.0); c.rotate(.32 + (R.state === 'paused' ? -.3 : 0));
   c.fillStyle = PAL.ink; c.beginPath(); c.arc(0, 0, R0 * .11, 0, 7); c.fill();
@@ -1446,29 +1506,44 @@ function drawDeck(){
   const r = w * .42;
   c.strokeStyle = PAL.panel2 || '#262626'; c.lineWidth = w * .02;
   const n = 60; for (let i = 0; i < n; i++){ const a = i / n * Math.PI * 2, l = r * (1.06 + (i % 5 === 0 ? .08 : .04)); c.strokeStyle = i % 5 === 0 ? '#3a3a3a' : '#262626'; c.beginPath(); c.moveTo(w/2 + Math.cos(a) * r * 1.04, w/2 + Math.sin(a) * r * 1.04); c.lineTo(w/2 + Math.cos(a) * l, w/2 + Math.sin(a) * l); c.stroke(); }
-  drawRecord(c, w / 2, w / 2, r, deckAng, PAL.lime, true);
+  drawRecord(c, w / 2, w / 2, r, deckAng, UI('lime'), true);
 }
 function deckLoop(){ if (!$('v-run').hidden && R.state === 'idle'){ deckAng += .004; drawDeck(); } requestAnimationFrame(deckLoop); }
 
 function renderUpNext(){
-  const el = $('upnext'); const s = upNextSong();
-  if (!s){ el.innerHTML = '<span class="dotc" style="background:var(--panel2);color:var(--paper)"><svg class="i"><use href="#i-plus"/></svg></span><span class="nm"><b>Crate is empty</b><span class="lbl" style="color:var(--muted)">add songs</span></span>'; el.onclick = () => showView('crate'); return; }
+  const el = $('upnext'); const s = upNextSong(); $('firstTip').hidden = loadJams().length > 0;
+  if (!s){ el.innerHTML = '<span class="dotc" style="background:var(--panel2);color:var(--fg)"><svg class="i"><use href="#i-plus"/></svg></span><span class="nm"><b>Crate is empty</b><span class="lbl" style="color:var(--muted)">add songs</span></span>'; el.onclick = () => showView('crate'); return; }
   el.onclick = () => showView('crate');
-  el.innerHTML = '<span class="dotc" style="background:' + PAL[colorOf(s)] + '"><svg class="i"><use href="#i-music"/></svg></span><span class="nm"><span class="lbl" style="color:var(--muted)">First up · ' + playable().length + ' in crate</span><b></b></span><span class="disp">' + Math.round(s.bpm) + '</span>';
+  el.innerHTML = '<span class="dotc" style="background:' + UI(colorOf(s)) + '"><svg class="i"><use href="#i-music"/></svg></span><span class="nm"><span class="lbl" style="color:var(--muted)">First up · ' + playable().length + ' in crate</span><b></b></span><span class="disp">' + Math.round(s.bpm) + '</span>';
   el.querySelector('b').textContent = s.name;
 }
 function renderChips(){
   const s = SRC[settings.source], d = DJ[settings.dj];
   $('chipSrc').innerHTML = '<svg><use href="#' + s.icon + '"/></svg><span>' + s.name + '</span>';
   $('chipDj').innerHTML = '<svg><use href="#' + d.icon + '"/></svg><span>' + d.name + '</span>';
-  $('chipPace').innerHTML = '<svg><use href="#i-bolt"/></svg><span>' + (settings.targetSpk ? 'Target ' + paceStr(tgtUnit()) + ' /' + UNIT().name : settings.pace ? Math.round(settings.pace) + ' spm' : 'Set target pace') + (settings.boost > 1 ? ' · ×' + settings.boost : '') + '</span>';
+  $('chipPace').innerHTML = '<svg><use href="#i-bolt"/></svg><span>' + (settings.targetSpk ? 'Target ' + paceStr(tgtUnit()) + ' /' + UNIT().name : settings.pace ? 'Target ' + paceStr(paceFromCad(settings.pace)) + ' /' + UNIT().name : 'Set target pace')  + '</span>';
 }
 $('chipPace').addEventListener('click', openPaceSetup);
 $('chipSrc').addEventListener('click', () => { const k = Object.keys(SRC); settings.source = k[(k.indexOf(settings.source) + 1) % k.length]; saveSettings(); renderChips(); toast(SRC[settings.source].icon, SRC[settings.source].name + (settings.source === 'tap' ? ' · tap the screen on each step' : settings.source === 'manual' ? ' · set pace in settings' : ' · steps from the phone')); });
 $('chipDj').addEventListener('click', () => { const k = Object.keys(DJ); settings.dj = k[(k.indexOf(settings.dj) + 1) % k.length]; saveSettings(); renderChips(); renderUpNext();
   toast(DJ[settings.dj].icon, { auto:'Auto-DJ · next song fits your pace', build:'Build up · slow to fast', shuffle:'Shuffle', order:'In order' }[settings.dj]); });
 // tap mode: tapping anywhere on the live screen counts a step
-$('live').addEventListener('pointerdown', e => { if (settings.source === 'tap' && (R.state === 'running' || R.state === 'paused') && !e.target.closest('.ctrls') && !e.target.closest('.metric') && !e.target.closest('#camBtn') && !e.target.closest('#tune') && !e.target.closest('#tuneBtn') && !e.target.closest('#sensorPill')) registerStep(performance.now()); });
+$('live').addEventListener('pointerdown', e => { if (settings.source === 'tap' && (R.state === 'running' || R.state === 'paused') && !e.target.closest('.ctrls') && !e.target.closest('.metric') && !e.target.closest('#camBtn') && !e.target.closest('#tune') && !e.target.closest('#tuneBtn') && !e.target.closest('#sensorPill') && !e.target.closest('.vibe')) registerStep(performance.now()); });
+/* vibe buttons on the run screen */
+function renderVibe(){ $('vibe').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(settings.vibe === b.dataset.v))); }
+$('vibe').querySelectorAll('button').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); const v = VIBES[b.dataset.v];
+  settings.vibe = b.dataset.v; settings.sens = v.sens; settings.boost = v.boost; settings.stretch = v.stretch; settings.paceStep = v.paceStep; settings.tempoStep = v.tempoStep; saveSettings(); renderVibe(); renderTune(); renderChips(); toast('i-dj', v.say); }));
+/* gestures on the run screen: double-tap = drop now, swipe sideways = skip */
+const G = { x:0, y:0, t:0, lastTap:0, on:false };
+const gestureFree = t => !t.closest('.ctrls') && !t.closest('.metric') && !t.closest('#tune') && !t.closest('#tuneBtn') && !t.closest('#sensorPill') && !t.closest('.vibe') && !t.closest('.pacer');
+$('live').addEventListener('pointerdown', e => { if (R.state !== 'running' || !gestureFree(e.target)) { G.on = false; return; } G.on = true; G.x = e.clientX; G.y = e.clientY; G.t = performance.now(); });
+$('live').addEventListener('pointerup', e => { if (!G.on) return; G.on = false; const dx = e.clientX - G.x, dy = e.clientY - G.y, dt = performance.now() - G.t;
+  if (Math.abs(dx) > 80 && Math.abs(dy) < 70 && dt < 700){ skipSong(); toast('i-skip', 'Skipped'); G.lastTap = 0; return; }
+  if (Math.abs(dx) < 18 && Math.abs(dy) < 18 && dt < 300 && settings.source !== 'tap'){ const now = performance.now(); if (now - G.lastTap < 380){ G.lastTap = 0; dropNow(); } else G.lastTap = now; } });
+function dropNow(){
+  if (R.state !== 'running') return; if (R.drop) return toast('i-fire', 'Drop already on');
+  if (!R.cad) return toast('i-info', 'Drops need your steps first'); startDrop(runSecs()); toast('i-fire', 'Drop incoming');
+}
 
 /* ================= covers ================= */
 function rng(seed){ let s = seed >>> 0 || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
@@ -1916,34 +1991,65 @@ $('setBtn').addEventListener('click', openSettings);
 function segHTML(id, opts, cur){ return '<div class="seg" id="' + id + '">' + opts.map(([v, label, icon]) => '<button data-v="' + v + '" aria-pressed="' + (String(v) === String(cur)) + '">' + (icon ? '<svg><use href="#' + icon + '"/></svg>' : '') + '<span>' + label + '</span></button>').join('') + '</div>'; }
 function openSettings(){
   openSheet('<div class="sheetHead"><h3>Settings</h3><button class="round" id="shClose" aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>' +
+    '<div class="set"><div class="hd"><b>Look</b><span class="lbl" style="color:var(--muted)">auto · day until 5 pm</span></div>' + segHTML('sTheme', [['auto', 'Auto'], ['day', 'Day'], ['night', 'Night']], settings.theme) + '</div>' +
+    '<div class="set"><div class="hd" style="margin:0"><b>Voice DJ at every km</b><button class="tog" id="sVoice" role="switch" aria-checked="' + (settings.voice !== false) + '" aria-label="Voice DJ at every km"></button></div></div>' +
     '<div class="set"><div class="hd"><b>Steps from</b></div>' + segHTML('sSrc', Object.entries(SRC).map(([k, v]) => [k, v.name, v.icon]), settings.source) +
-      '<div id="manualBox" ' + (settings.source === 'manual' ? '' : 'hidden') + ' style="margin-top:12px"><div class="hd"><span class="lbl">pace</span><span class="disp" style="font-size:26px" id="manVal">' + settings.manual + '</span></div><input type="range" id="sMan" min="100" max="200" value="' + settings.manual + '"></div>' +
+      '<div id="manualBox" ' + (settings.source === 'manual' ? '' : 'hidden') + ' style="margin-top:12px"><div class="hd"><span class="lbl">steps / min</span><span class="disp" style="font-size:26px" id="manVal">' + settings.manual + '</span></div><input type="range" id="sMan" min="100" max="200" value="' + settings.manual + '"></div>' +
       '<div id="tapBox" ' + (settings.source === 'tap' ? '' : 'hidden') + ' style="margin-top:12px" class="lbl">tap anywhere on the run screen with each step</div></div>' +
-    '<div class="set"><div class="hd"><b>Music reacts</b><span class="lbl" id="sensName">' + SENS[settings.sens - 1].name + '</span></div><input type="range" id="sSens" min="1" max="5" value="' + settings.sens + '" aria-label="How fast the music reacts"><div class="hd" style="margin:0"><span class="lbl" style="color:var(--muted)">slow · steady</span><span class="lbl" style="color:var(--muted)">fast · jumpy</span></div><p class="lbl" style="color:var(--muted);margin:8px 0 0;line-height:1.5">how quickly the music catches up when your step rate changes</p></div>' +
-    '<div class="set"><div class="hd"><b>Boost</b><span class="lbl" style="color:var(--muted)" id="boostInfo"></span></div>' + segHTML('sBoost', [[1, '1×'], [1.5, '1.5×'], [2, '2×'], [3, '3×']], settings.boost) + '</div>' +
+    '<div class="set"><div class="hd"><b>Pace step</b><span class="disp" style="font-size:26px" id="psVal"></span></div><input type="range" id="sPs" min="1" max="10" step="1" value="' + (settings.paceStep || 2) + '" aria-label="Pace step in seconds">' +
+      '<div class="hd" style="margin-top:10px"><b>Tempo step</b><span class="disp" style="font-size:26px" id="tsVal"></span></div><input type="range" id="sTs" min="1" max="5" step="1" value="' + (settings.tempoStep || 1) + '" aria-label="Tempo step in percent">' +
+      '<p class="lbl" style="color:var(--muted);margin:8px 0 0;line-height:1.5" id="stepInfo"></p></div>' +
+    '<div class="set"><div class="hd"><b>Slowest pace</b><span class="disp" style="font-size:26px" id="slowVal"></span></div><input type="range" id="sSlow" min="150" max="900" step="5" aria-label="Slowest pace the music follows">' +
+      '<div class="hd" style="margin-top:10px"><b>Fastest pace</b><span class="disp" style="font-size:26px" id="fastVal"></span></div><input type="range" id="sFast" min="150" max="900" step="5" aria-label="Fastest pace the music follows">' +
+      '<p class="lbl" style="color:var(--muted);margin:8px 0 0;line-height:1.5">the music stops slowing down or speeding up past these · slide to the end for no limit</p></div>' +
     '<div class="set"><div class="hd"><b>Stretch</b><span class="lbl" style="color:var(--muted)" id="strInfo"></span></div>' + segHTML('sStr', STRETCH.map((s, i) => [i, s.name]), settings.stretch) + '</div>' +
     '<div class="set"><div class="hd"><b>Song order</b></div>' + segHTML('sDj', Object.entries(DJ).map(([k, v]) => [k, v.name.replace('In order', 'Order').replace('Build up', 'Build'), null]), settings.dj) + '</div>' +
     '<div class="set"><div class="hd"><b>Auto-pause</b><button class="tog" id="sAuto" role="switch" aria-checked="' + settings.autoPause + '" aria-label="Auto-pause"></button></div><div class="hd"><b>Sounds</b><button class="tog" id="sSnd" role="switch" aria-checked="' + settings.sound + '" aria-label="Countdown and effect sounds"></button></div><div class="hd"><b>Audio engine</b></div>' + segHTML('sEng', [['smooth', 'Smooth'], ['studio', 'Classic'], ['lite', 'Lite']], settings.engine) + '<p class="lbl" style="color:var(--muted);margin:8px 0 12px;line-height:1.5">smooth · our own tempo engine, no gaps · classic / lite · the phone\'s built-in one</p><div class="hd"><b>Jump sound</b></div>' + segHTML('sJump', [['random', 'Mix'], ['horn', 'Horn'], ['laser', 'Laser'], ['crash', 'Crash'], ['off', 'Off']], settings.jumpFx) + '<div class="hd" style="margin-top:12px"><b>Tape stop on pause</b><button class="tog" id="sTape" role="switch" aria-checked="' + settings.tapeStop + '" aria-label="Tape stop on auto-pause"></button></div><div class="hd"><b>Crossfade songs</b><button class="tog" id="sXf" role="switch" aria-checked="' + settings.xfade + '" aria-label="Crossfade between songs"></button></div><div class="hd" style="margin:0"><b>Drops</b><button class="tog" id="sDrop" role="switch" aria-checked="' + settings.drops + '" aria-label="Drops"></button></div><p class="lbl" style="color:var(--muted);margin:10px 0 0;line-height:1.5">drop · every 4 min the music jumps 6% ahead for 30 s</p></div>' +
     '<div class="set"><div class="hd"><b>You</b><span class="lbl" style="color:var(--muted)">saved on this phone only</span></div>' + segHTML('sUnits', [['mi', 'Miles'], ['km', 'Kilometers']], settings.units) +
       '<div class="row" style="margin-top:10px;flex-wrap:nowrap"><label style="flex:1"><span class="lbl" style="color:var(--muted)">height cm</span><input class="numIn" id="sHeight" type="number" inputmode="numeric" min="120" max="220" value="' + (settings.height || '') + '"></label><label style="flex:1"><span class="lbl" style="color:var(--muted)">weight kg · for calories</span><input class="numIn" id="sWeight" type="number" inputmode="numeric" min="30" max="200" placeholder="optional" value="' + (settings.weight || '') + '"></label></div>' +
       '<p class="lbl" style="color:var(--muted);margin:10px 0 0;line-height:1.5">distance uses GPS when the phone allows it, otherwise your steps × stride from height</p></div>' +
-    '<p class="note"><svg><use href="#i-info"/></svg><span>Set Auto-Lock to Never before a run. Steps stop counting when the screen locks.</span></p>');
-  $('shClose').onclick = closeSheet;
+    '<p class="note"><svg><use href="#i-info"/></svg><span>Set Auto-Lock to Never before a run. Steps stop counting when the screen locks.</span></p>' +
+    '<button class="btn" id="sPriv" style="width:100%;margin-top:14px"><svg><use href="#i-info"/></svg>Privacy · what leaves this phone</button>');
+  $('shClose').onclick = closeSheet; $('sPriv').onclick = openPrivacy;
   const strInfo = () => { const s = STRETCH[settings.stretch]; $('strInfo').textContent = Math.round(s.lo * 100) + '–' + Math.round(s.hi * 100) + '%'; }; strInfo();
   const bindSeg = (id, fn) => $(id).querySelectorAll('button').forEach(b => b.onclick = () => { $(id).querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); fn(b.dataset.v); saveSettings(); renderChips(); renderUpNext(); });
   bindSeg('sSrc', v => { settings.source = v; $('manualBox').hidden = v !== 'manual'; $('tapBox').hidden = v !== 'tap'; });
-  bindSeg('sStr', v => { settings.stretch = +v; strInfo(); });
+  bindSeg('sStr', v => { settings.stretch = +v; settings.vibe = null; strInfo(); });
   bindSeg('sDj', v => { settings.dj = v; });
-  const boostInfo = () => { $('boostInfo').textContent = settings.boost > 1 ? '10% faster steps → ' + Math.round(10 * settings.boost) + '% faster music' : 'music matches your steps'; }; boostInfo();
-  bindSeg('sBoost', v => { settings.boost = +v; boostInfo(); });
   bindSeg('sUnits', v => { settings.units = v; });
+  bindSeg('sTheme', v => { settings.theme = v; applyTheme(); renderCrate(); drawDeck(); });
+  $('sVoice').onclick = () => { settings.voice = settings.voice === false; $('sVoice').setAttribute('aria-checked', String(settings.voice)); saveSettings(); if (settings.voice) say('Voice DJ on.'); };
   $('sHeight').onchange = e => { const v = +e.target.value; if (v >= 120 && v <= 220){ settings.height = v; saveSettings(); } };
   $('sWeight').onchange = e => { const v = +e.target.value; settings.weight = v >= 30 && v <= 200 ? v : null; saveSettings(); };
   $('sMan').oninput = e => { settings.manual = +e.target.value; $('manVal').textContent = settings.manual; saveSettings(); };
-  $('sSens').oninput = e => { settings.sens = +e.target.value; $('sensName').textContent = SENS[settings.sens - 1].name; saveSettings(); };
+  // pace step + tempo step (Hej, Oct 3)
+  const stepInfo = () => { $('psVal').textContent = (settings.paceStep || 2) + '"'; $('tsVal').textContent = (settings.tempoStep || 1) + '%';
+    $('stepInfo').textContent = 'every ' + (settings.paceStep || 2) + '" faster per ' + UNIT().name + ' → music +' + (settings.tempoStep || 1) + '% · slower → music −' + (settings.tempoStep || 1) + '%'; }; stepInfo();
+  $('sPs').oninput = e => { settings.paceStep = +e.target.value; settings.vibe = null; stepInfo(); saveSettings(); };
+  $('sTs').oninput = e => { settings.tempoStep = +e.target.value; settings.vibe = null; stepInfo(); saveSettings(); };
+  // limits: stored per km, shown per your unit; slowest at the right end = no limit, fastest at the left end = no limit
+  const K = () => UNIT().m / 1000;
+  const limShow = () => { $('slowVal').textContent = settings.slowSpk ? paceStr(settings.slowSpk * K()) : 'No limit'; $('fastVal').textContent = settings.fastSpk ? paceStr(settings.fastSpk * K()) : 'No limit'; };
+  $('sSlow').value = settings.slowSpk ? Math.round(settings.slowSpk * K()) : 900; $('sFast').value = settings.fastSpk ? Math.round(settings.fastSpk * K()) : 150; limShow();
+  $('sSlow').oninput = e => { const v = +e.target.value; settings.slowSpk = v >= 900 ? null : v / K(); if (settings.slowSpk && settings.fastSpk && settings.fastSpk > settings.slowSpk - 10 / K()){ settings.fastSpk = null; $('sFast').value = 150; } limShow(); saveSettings(); };
+  $('sFast').oninput = e => { const v = +e.target.value; settings.fastSpk = v <= 150 ? null : v / K(); if (settings.slowSpk && settings.fastSpk && settings.fastSpk > settings.slowSpk - 10 / K()){ settings.slowSpk = null; $('sSlow').value = 900; } limShow(); saveSettings(); };
   const tog = (id, key) => $(id).onclick = () => { settings[key] = !settings[key]; $(id).setAttribute('aria-checked', String(settings[key])); saveSettings(); };
   bindSeg('sEng', v => { if (v === settings.engine) return; settings.engine = v; toast('i-info', 'Reload the page to switch audio engine'); });
   tog('sAuto', 'autoPause'); tog('sSnd', 'sound'); tog('sXf', 'xfade'); tog('sTape', 'tapeStop'); bindSeg('sJump', v => { settings.jumpFx = v; if (v !== 'off'){ jumpSound(); } }); tog('sDrop', 'drops');
+}
+
+// privacy note (legal checklist, Oct 3): plain list of what stays on the phone and what doesn't
+function openPrivacy(){
+  const row = (t, b) => '<div class="set"><div class="hd" style="margin-bottom:6px"><b>' + t + '</b></div><p style="margin:0;color:var(--muted);font-size:14px;line-height:1.45">' + b + '</p></div>';
+  openSheet('<div class="sheetHead"><h3>Privacy</h3><button class="round" id="shClose" aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>' +
+    row('Stays on this phone', 'Your jams, songs, photos, settings, height and weight. Motion, GPS and the camera are only used during a run, on the phone.') +
+    row('Google Fonts', 'The letters load from Google, so Google sees your IP address when the app opens.') +
+    row('Voice DJ', 'At each km the phone\'s own speech voice reads your distance, song count and pace. Nothing else is said or sent by the app.') +
+    row('Starter Crate', 'Only if you tap it: Jamendo sends the songs and sees your IP address. Songs stream and are never saved.') +
+    row('Crew', 'Only in the Claude version, only when you tap Share: your name, the jam\'s name, stats, song names and the cover go to the Crew feed. Never your route or photos.') +
+    row('Not in this app', 'No accounts, ads, analytics or tracking.') +
+    '<p class="lbl" style="color:var(--muted);margin:10px 2px 0;line-height:1.5">prototype note · not a full privacy policy yet</p>');
+  $('shClose').onclick = closeSheet;
 }
 
 /* ================= nav + toast ================= */
@@ -1959,6 +2065,8 @@ let toastT = null;
 function toast(icon, text){ const t = $('toast'); t.innerHTML = '<svg><use href="#' + icon + '"/></svg><span></span>'; t.querySelector('span').textContent = text; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2200); }
 
 /* ================= boot ================= */
+applyTheme(); setInterval(() => { if (R.state === 'idle' && settings.theme === 'auto' && document.documentElement.classList.contains('day') !== isDay()){ applyTheme(); renderCrate(); renderUpNext(); drawDeck(); } }, 60000);
+renderVibe();
 renderChips(); renderCrate(); renderUpNext(); renderJams();
 let startTab = 'run'; try{ startTab = sessionStorage.getItem('rj-tab') || 'run'; }catch(e){}
 if (location.hash && ['run', 'crate', 'jams', 'crew'].includes(location.hash.slice(1))) startTab = location.hash.slice(1);
@@ -1968,9 +2076,7 @@ loadStoredSongs();
 initCrew();
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { renderJams(); drawDeck(); });
 
-window.__jam = { hotCue, cheerLine, startDance, get pacer(){ return { st:R.pStatus, pace:R.pPace, gap:R.pGap, on:R.pOn, kicks:R.kicks, splits:R.splits }; }, get actx(){ return actx; }, get gainNode(){ return gainNode; }, get engine(){ return D[0].el.smooth ? 'smooth' : 'element'; }, savePhoto, photoImg, paintCover, onJump, JMP, CAL, openPaceSetup, drawRoute:null, D, get active(){ return active; }, openBpm, detectBPM, synthTrack, drawCover, R, crate, settings, registerStep, finishRun, showSummary, openJam, loadJams, saveJams, showView, renderJams };
+window.__jam = { hotCue, cheerLine, startDance, get pacer(){ return { st:R.pStatus, pace:R.pPace, gap:R.pGap, on:R.pOn, kicks:R.kicks, splits:R.splits }; }, get actx(){ return actx; }, get gainNode(){ return gainNode; }, get engine(){ return D[0].el.smooth ? 'smooth' : 'element'; }, savePhoto, photoImg, paintCover, onJump, JMP, CAL, openPaceSetup, drawRoute:null, D, get active(){ return active; }, openBpm, detectBPM, synthTrack, drawCover, R, crate, settings, registerStep, finishRun, showSummary, openJam, loadJams, saveJams, showView, renderJams, openPrivacy, applyTheme, isDay, say, showKm, dropNow, splitCheck };
 })();
 </script>
-
-
 </body></html>
