@@ -278,6 +278,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 .vibe{pointer-events:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:rgba(0,0,0,.16);border-radius:99px;padding:4px;width:100%;max-width:340px;margin:0 auto 12px}
 .vibe button{height:50px;border-radius:99px;font:400 21px var(--display);text-transform:uppercase;color:var(--ink);opacity:.62}
 .vibe button[aria-pressed="true"]{background:var(--ink);color:var(--paper);opacity:1}
+#stepTag{pointer-events:auto;display:block;margin:-4px auto 12px;min-height:36px;padding:8px 16px;border-radius:99px;background:rgba(0,0,0,.12);color:var(--ink);font:700 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
 #kmCard{position:absolute;inset:0;z-index:4;background:var(--ink);color:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;pointer-events:none;padding:24px}
 #kmCard[hidden]{display:none}
 #kmCard.on{animation:pop .7s cubic-bezier(.2,.9,.2,1)}
@@ -417,6 +418,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     <div class="pacer warm" id="pacer" hidden><span class="pTag" id="pTag">WARMING UP</span><span class="pNow" id="pNow">—</span><span class="pGap" id="pGap"></span></div>
     <div class="groove"><span class="lbl">Groove</span><span class="bar"><i id="grooveBar"></i></span></div>
     <div class="vibe" id="vibe" role="group" aria-label="Vibe"><button data-v="chill">Chill</button><button data-v="groove">Groove</button><button data-v="hype">Hype</button></div>
+    <button id="stepTag" aria-label="Pace step and tempo step · tap to adjust"></button>
     <div class="ctrls">
       <div class="holdWrap">
         <button class="cbtn" id="stopBtn" aria-label="Hold to end run"><svg><use href="#i-stop"/></svg></button>
@@ -1427,7 +1429,11 @@ function renderLive(){
     $('pNow').textContent = R.pPace ? paceStr(R.pPace * U.m / 1000) : '—';
     $('pGap').textContent = 'now\ntarget ' + paceStr(tgtUnit());
     $('pGap').style.whiteSpace = 'pre'; }
+  // pace step on the run screen (Oct 4): the rule, and where the music sits right now
+  const ps = settings.paceStep || 2, ts = settings.tempoStep || 1, now = R.ref && R.pStep != null ? R.pStep * ts : null;
+  $('stepTag').textContent = ps + '"/' + UNIT().name + ' → ' + ts + '%' + (now == null ? ' · finding your step' : ' · music ' + (now > 0 ? '+' : now < 0 ? '−' : '±') + Math.abs(now) + '%');
 }
+$('stepTag').addEventListener('click', e => { e.stopPropagation(); $('tune').hidden = false; renderTune(); });
 
 /* ================= visuals ================= */
 const vcv = $('vizCv'); let vw = 0, vh = 0, dpr = 1, vTop = 60, vBot = 400, vMeas = 0;
@@ -1528,14 +1534,14 @@ $('chipSrc').addEventListener('click', () => { const k = Object.keys(SRC); setti
 $('chipDj').addEventListener('click', () => { const k = Object.keys(DJ); settings.dj = k[(k.indexOf(settings.dj) + 1) % k.length]; saveSettings(); renderChips(); renderUpNext();
   toast(DJ[settings.dj].icon, { auto:'Auto-DJ · next song fits your pace', build:'Build up · slow to fast', shuffle:'Shuffle', order:'In order' }[settings.dj]); });
 // tap mode: tapping anywhere on the live screen counts a step
-$('live').addEventListener('pointerdown', e => { if (settings.source === 'tap' && (R.state === 'running' || R.state === 'paused') && !e.target.closest('.ctrls') && !e.target.closest('.metric') && !e.target.closest('#camBtn') && !e.target.closest('#tune') && !e.target.closest('#tuneBtn') && !e.target.closest('#sensorPill') && !e.target.closest('.vibe')) registerStep(performance.now()); });
+$('live').addEventListener('pointerdown', e => { if (settings.source === 'tap' && (R.state === 'running' || R.state === 'paused') && !e.target.closest('.ctrls') && !e.target.closest('.metric') && !e.target.closest('#camBtn') && !e.target.closest('#tune') && !e.target.closest('#tuneBtn') && !e.target.closest('#sensorPill') && !e.target.closest('.vibe,#stepTag')) registerStep(performance.now()); });
 /* vibe buttons on the run screen */
 function renderVibe(){ $('vibe').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(settings.vibe === b.dataset.v))); }
 $('vibe').querySelectorAll('button').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); const v = VIBES[b.dataset.v];
   settings.vibe = b.dataset.v; settings.sens = v.sens; settings.boost = v.boost; settings.stretch = v.stretch; settings.paceStep = v.paceStep; settings.tempoStep = v.tempoStep; saveSettings(); renderVibe(); renderTune(); renderChips(); toast('i-dj', v.say); }));
 /* gestures on the run screen: double-tap = drop now, swipe sideways = skip */
 const G = { x:0, y:0, t:0, lastTap:0, on:false };
-const gestureFree = t => !t.closest('.ctrls') && !t.closest('.metric') && !t.closest('#tune') && !t.closest('#tuneBtn') && !t.closest('#sensorPill') && !t.closest('.vibe') && !t.closest('.pacer');
+const gestureFree = t => !t.closest('.ctrls') && !t.closest('.metric') && !t.closest('#tune') && !t.closest('#tuneBtn') && !t.closest('#sensorPill') && !t.closest('.vibe,#stepTag') && !t.closest('.pacer');
 $('live').addEventListener('pointerdown', e => { if (R.state !== 'running' || !gestureFree(e.target)) { G.on = false; return; } G.on = true; G.x = e.clientX; G.y = e.clientY; G.t = performance.now(); });
 $('live').addEventListener('pointerup', e => { if (!G.on) return; G.on = false; const dx = e.clientX - G.x, dy = e.clientY - G.y, dt = performance.now() - G.t;
   if (Math.abs(dx) > 80 && Math.abs(dy) < 70 && dt < 700){ skipSong(); toast('i-skip', 'Skipped'); G.lastTap = 0; return; }
@@ -2078,5 +2084,4 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { re
 
 window.__jam = { hotCue, cheerLine, startDance, get pacer(){ return { st:R.pStatus, pace:R.pPace, gap:R.pGap, on:R.pOn, kicks:R.kicks, splits:R.splits }; }, get actx(){ return actx; }, get gainNode(){ return gainNode; }, get engine(){ return D[0].el.smooth ? 'smooth' : 'element'; }, savePhoto, photoImg, paintCover, onJump, JMP, CAL, openPaceSetup, drawRoute:null, D, get active(){ return active; }, openBpm, detectBPM, synthTrack, drawCover, R, crate, settings, registerStep, finishRun, showSummary, openJam, loadJams, saveJams, showView, renderJams, openPrivacy, applyTheme, isDay, say, showKm, dropNow, splitCheck };
 })();
-</script>
-</body></html>
+</script></body></html>
